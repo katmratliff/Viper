@@ -11,6 +11,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1Zx9ER5InWxLVPJnj8DyXpkUT37" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -19,6 +20,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="com.digi.micropython.xbee_platform" value="Digi XBee Cellular 3G" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager">
@@ -40,6 +42,10 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
+    <state x="1217" y="266" key="FileChooserDialogImpl" timestamp="1585920908551">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1217" y="266" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1585920908551" />
     <state x="461" y="162" key="SettingsEditor" timestamp="1585837719900">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
