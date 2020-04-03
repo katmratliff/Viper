@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9807b173-736a-4191-b25e-3a09cccafa01" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/hawes.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Viper.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Viper.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,19 +24,29 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.digi.micropython.xbee_platform" value="Digi XBee Cellular 3G" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\hawes\PycharmProjects\Viper" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="XBee MicroPython.main.py">
     <configuration name="Viper" type="XBeeMicroPythonConfigurationType" factoryName="XBee MicroPython" path="$PROJECT_DIR$" autoStart="true">
       <method v="2" />
     </configuration>
+    <configuration name="main.py" type="XBeeMicroPythonConfigurationType" factoryName="XBee MicroPython" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/main.py" autoStart="true">
+      <module name="Viper" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="XBee MicroPython.main.py" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -53,10 +66,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1217" y="266" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1585920908551" />
-    <state x="461" y="162" key="SettingsEditor" timestamp="1585837719900">
+    <state x="461" y="162" key="SettingsEditor" timestamp="1585928463519">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="162" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1585837719900" />
+    <state x="461" y="162" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1585928463519" />
     <state x="1133" y="348" key="com.intellij.ide.util.TipDialog" timestamp="1585920022938">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
