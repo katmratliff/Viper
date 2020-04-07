@@ -55,39 +55,99 @@ This ^^ is all the body
 '''
 
 uart = UART(1, 115200)
-data = 
+data = 0
+
 
 def read_serial():
+    host = "Placeholder"  # this will be the Viper URL
     if uart.any() > 0:
-        read_text = uart.read(uart.any())
-        # uart.write(bytearray(read_text))
-    time.sleep(0.1)
+        post = uart.read(uart.any())
+        http_post(host, post)
+    time.sleep(5)
 
 
 '''
-
+example
+FORMAT TO USE % s 'POST /CAP/post HTTP/1.1\r\nHost: %s\r\n\r\n' % host, 'utf16'
+ 
 post = bytes('POST /CAP/post HTTP/1.1\r\nHost: viper.response.epa.gov\r\nAuthorization: '
-                     'Y29sbGllci5qYW1lc0BlcGEuZ292OldldGJvYXJkdGVhbTEh\r\nContent-Length: 547\r\nConnection: '
-                     'Keep-Alive\r\n\r\n', 'utf8')
-                     FORMAT TO USE % s 'POST /CAP/post HTTP/1.1\r\nHost: %s\r\n\r\n' % host, 'utf16'
+                     'Basic Y29sbGllci5qYW1lc0BlcGEuZ292OldldGJvYXJkdGVhbTEh\r\nContent-Length: 547\r\nConnection: '
+                     'Keep-Alive\r\n<?xml version="1.0" encoding="utf-16"?>
+<alert xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+       xmlns="urn:oasis:names:tc:emergency:cap:1.1">
+<identifier>281005951_634498074648864996</identifier>
+<sender>My Device</sender>
+<sent>2011-08-19T15:31:08-04:00</sent>>
+<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>
+<info>
+  <headline>ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>
+  <area>
+    <circle>38.904722, -77.016389 0</circle>
+  </area>
+</info>
+</alert>\r\n', 'utf16')
+
+<?xml version="1.0" encoding="utf-16"?>
+<alert xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+       xmlns="urn:oasis:names:tc:emergency:cap:1.1">
+<identifier>281005951_634498074648864996</identifier>
+<sender>My Device</sender>
+<sent>2011-08-19T15:31:08-04:00</sent>>
+<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>
+<info>
+  <headline>ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>
+  <area>
+    <circle>38.904722, -77.016389 0</circle>
+  </area>
+</info>
+</alert>
                      
 '''
 
 
-def http_post(url):
-    scheme, _, host, path = url.split('/', 3)
+def http_post(host, body):
     s = socket.socket()
     try:
         s.connect((host, 443))
-        post = bytes('POST /CAP/post HTTP/1.1\r\nHost: viper.response.epa.gov\r\nAuthorization: '
-                     'Y29sbGllci5qYW1lc0BlcGEuZ292OldldGJvYXJkdGVhbTEh\r\nContent-Length: %s\r\nConnection: '
-                     'Keep-Alive\r\n\r\n', 'utf8')
-        print("Requesting /%s from host %s\n" % (path, host))
+        # post = bytes('POST /CAP/post HTTP/1.1\r\nHost: viper.response.epa.gov\r\nAuthorization: '
+        #             'Y29sbGllci5qYW1lc0BlcGEuZ292OldldGJvYXJkdGVhbTEh\r\nContent-Length: %s\r\nConnection: '
+        #             'Keep-Alive\r\n\r\n', 'utf8')
+        post = bytes(body)
+        print("Requesting from host")
         s.send(post)
         while True:
             print(str(s.recv(500), 'utf8'), end='')
     finally:
         s.close()
+
+
+def http_test():
+    st = socket.socket()
+    try:
+        st.connect(("https://viper.response.epa.gov/CAP/post", 443))
+        post = bytes('POST /CAP/post HTTP/1.1\r\nHost: viper.response.epa.gov\r\nAuthorization: '
+                     'Basic Y29sbGllci5qYW1lc0BlcGEuZ292OldldGJvYXJkdGVhbTEh\r\nContent-Length: 547\r\nConnection: '
+                     'Keep-Alive\r\n'
+                     '<?xml version="1.0" encoding="utf-16"?>'
+                     '<alert xmlns: xsi = "http://www.w3.org/2001/XMLSchema-instance"'
+                     'xmlns: xsd = "http://www.w3.org/2001/XMLSchema"'
+                     'xmlns = "urn:oasis:names:tc:emergency:cap:1.1">'
+                     '<identifier> 281005951_634498074648864996 </identifier '
+                     '<sender> EPA_WET_BOARD </sender>'
+                     '<sent>2011-08-19T15:31:08-04:00</sent>>'
+                     '<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>'
+                     '<info>'
+                     '<headline> ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>'
+                     '<area>'
+                     '<circle>38.904722, -77.016389 0</circle>'
+                     '</area>'
+                     '</info>'
+                     '</alert>\r\n\r\n')
+        st.send(post)
+    finally:
+        st.close()
 
 
 i2c = I2C(1, freq=400000)  # I2c Module
