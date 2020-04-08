@@ -11,6 +11,7 @@ from machine import UART
 import time
 from machine import I2C
 import usocket
+
 # socket notes
 '''
 # Import the socket module.  
@@ -194,22 +195,24 @@ def http_test():
     finally:
         st.close()
 
-def socket_send():
-    post = bytes('<?xml version="1.0" encoding="utf-16"?>'
-                     '<alert xmlns: xsi = "http://www.w3.org/2001/XMLSchema-instance"'
-                     'xmlns: xsd = "http://www.w3.org/2001/XMLSchema"'
-                     'xmlns = "urn:oasis:names:tc:emergency:cap:1.1">'
-                     '<identifier> 281005951_634498074648864996 </identifier '
-                     '<sender> EPA_WET_BOARD </sender>'
-                     '<sent>2011-08-19T15:31:08-04:00</sent>>'
-                     '<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>'
-                     '<info>'
-                     '<headline> ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>'
-                     '<area>'
-                     '<circle>38.904722, -77.016389 0</circle>'
-                     '</area>'
-                     '</info>'
-                     '</alert>\r\n\r\n')
+
+def ssend(): 
+    print("\nPrinting the remainder of the server's response: \n")
+    post = bytes('<?xml version="1.0" encoding="utf-8"?>'
+                 '<alert xmlns: xsi = "http://www.w3.org/2001/XMLSchema-instance"'
+                 'xmlns: xsd = "http://www.w3.org/2001/XMLSchema"'
+                 'xmlns = "urn:oasis:names:tc:emergency:cap:1.1">'
+                 '<identifier> 281005951_634498074648864996 </identifier '
+                 '<sender> EPA_WET_BOARD </sender>'
+                 '<sent>2011-08-19T15:31:08-04:00</sent>>'
+                 '<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>'
+                 '<info>'
+                 '<headline> ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>'
+                 '<area>'
+                 '<circle>38.904722, -77.016389 0</circle>'
+                 '</area>'
+                 '</info>'
+                 '</alert>\r\n\r\n', 'utf-8')
     socketObject = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
     socketObject.connect(("remote.ertviper.org", 8038))
     socketObject.send(post)
@@ -222,7 +225,8 @@ def socket_send():
     # bytes from the server, or as many bytes as are available.
     # Receive and output the remainder of the page data.
     socketObject.recv(512)
-
+    socketObject.close()
+    print("Socket closed.")
 
 i2c = I2C(1, freq=400000)  # I2c Module
 
@@ -235,5 +239,5 @@ def i2c_read():
 
 
 while True:
-    socket_send()
+    ssend()
     time.sleep(120)
