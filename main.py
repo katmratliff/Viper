@@ -10,8 +10,53 @@ import socket
 from machine import UART
 import time
 from machine import I2C
+import usocket
+# socket notes
+'''
+# Import the socket module.  
+# This allows the creation/use of socket objects.
+ 
+import usocket
+# Create a TCP socket that can communicate over the internet.
+socketObject = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
+# Create a "request" string, which is how we "ask" the web server for data.
+request = "GET /ks/test.html HTTP/1.1\r\nHost: www.micropython.org\r\n\r\n"
+# Connect the socket object to the web server
+socketObject.connect(("www.micropython.org", 80))
+# Send the "GET" request to the MicroPython web server.  
+# A "GET" request asks the server for the web page data.
+bytessent = socketObject.send(request)
+print("\r\nSent %d byte GET request to the web server." % bytessent)
+ 
+print("Printing first 3 lines of server's response: \r\n")
+# Single lines can be read from the socket, 
+# useful for separating headers or
+# reading other data line-by-line.
+# Use the "readline" call to do this.  
+# Calling it a few times will show the
+# first few lines from the server's response.
+socketObject.readline()
+socketObject.readline()
+socketObject.readline()
+# The first 3 lines of the server's response 
+# will be received and output to the terminal.
+ 
+print("\nPrinting the remainder of the server's response: \n")
+# Use a "standard" receive call, "recv", 
+# to receive a specified number of
+# bytes from the server, or as many bytes as are available.
+# Receive and output the remainder of the page data.
+socketObject.recv(512)
+ 
+# Close the socket's current connection now that we are finished.
+socketObject.close()
+print("Socket closed.")
+ 
 
+'''
 # Set up HTTP COMMS with VIPER
+
+
 '''VIPER - CAP via HTTPS - Notes:
 
 ----------------------------------------
@@ -67,7 +112,7 @@ def read_serial():
 
 
 '''
-example
+HTTP example
 FORMAT TO USE % s 'POST /CAP/post HTTP/1.1\r\nHost: %s\r\n\r\n' % host, 'utf16'
  
 post = bytes('POST /CAP/post HTTP/1.1\r\nHost: viper.response.epa.gov\r\nAuthorization: '
@@ -149,6 +194,35 @@ def http_test():
     finally:
         st.close()
 
+def socket_send():
+    post = bytes('<?xml version="1.0" encoding="utf-16"?>'
+                     '<alert xmlns: xsi = "http://www.w3.org/2001/XMLSchema-instance"'
+                     'xmlns: xsd = "http://www.w3.org/2001/XMLSchema"'
+                     'xmlns = "urn:oasis:names:tc:emergency:cap:1.1">'
+                     '<identifier> 281005951_634498074648864996 </identifier '
+                     '<sender> EPA_WET_BOARD </sender>'
+                     '<sent>2011-08-19T15:31:08-04:00</sent>>'
+                     '<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>'
+                     '<info>'
+                     '<headline> ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>'
+                     '<area>'
+                     '<circle>38.904722, -77.016389 0</circle>'
+                     '</area>'
+                     '</info>'
+                     '</alert>\r\n\r\n')
+    socketObject = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
+    socketObject.connect(("remote.ertviper.org", 8038))
+    socketObject.send(post)
+    socketObject.readline()
+    socketObject.readline()
+    socketObject.readline()
+    print("\nPrinting the remainder of the server's response: \n")
+    # Use a "standard" receive call, "recv",
+    # to receive a specified number of
+    # bytes from the server, or as many bytes as are available.
+    # Receive and output the remainder of the page data.
+    socketObject.recv(512)
+
 
 i2c = I2C(1, freq=400000)  # I2c Module
 
@@ -161,4 +235,5 @@ def i2c_read():
 
 
 while True:
-    time.sleep(0.1)
+    socket_send()
+    time.sleep(120)
