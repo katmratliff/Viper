@@ -196,35 +196,34 @@ def http_test():
         st.close()
 
 
-def ssend(): 
-    print("\nPrinting the remainder of the server's response: \n")
-    post = bytes('<?xml version="1.0" encoding="utf-8"?>'
-                 '<alert xmlns: xsi = "http://www.w3.org/2001/XMLSchema-instance"'
-                 'xmlns: xsd = "http://www.w3.org/2001/XMLSchema"'
-                 'xmlns = "urn:oasis:names:tc:emergency:cap:1.1">'
-                 '<identifier> 281005951_634498074648864996 </identifier '
-                 '<sender> EPA_WET_BOARD </sender>'
-                 '<sent>2011-08-19T15:31:08-04:00</sent>>'
-                 '<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>'
-                 '<info>'
-                 '<headline> ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>'
-                 '<area>'
-                 '<circle>38.904722, -77.016389 0</circle>'
-                 '</area>'
-                 '</info>'
-                 '</alert>\r\n\r\n', 'utf-8')
+def ssend():
+    print("\n Starting Response \n")
+    post = bytes('<?xml version="1.0" encoding="utf-8"?>\n'
+                 '<alert xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
+                 'xmlns:xsd="http://www.w3.org/2001/XMLSchema"\n'
+                 'xmlns="urn:oasis:names:tc:emergency:cap:1.1">\n'
+                 '<identifier>281005951_634498074648864996</identifier>\n'
+                 '<sender>EPA_WET_BOARD</sender>\n'
+                 '<sent>2011-08-19T15:31:08-04:00</sent>\n'
+                 '<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>\n'
+                 '<info>\n'
+                 '<headline>ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>\n'
+                 '<area>\n'
+                 '<circle>38.904722, -77.016389 0</circle>\n'
+                 '</area>\n'
+                 '</info>\n'
+                 '</alert>\n', 'utf-8')
     socketObject = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
     socketObject.connect(("remote.ertviper.org", 8038))
+    print(" Sending \n")
     socketObject.send(post)
-    socketObject.readline()
-    socketObject.readline()
-    socketObject.readline()
-    print("\nPrinting the remainder of the server's response: \n")
+    print(socketObject.readline())
+
+    print("Printing the remainder of the server's response: \n")
     # Use a "standard" receive call, "recv",
     # to receive a specified number of
     # bytes from the server, or as many bytes as are available.
     # Receive and output the remainder of the page data.
-    socketObject.recv(512)
     socketObject.close()
     print("Socket closed.")
 
@@ -240,4 +239,5 @@ def i2c_read():
 
 while True:
     ssend()
-    time.sleep(120)
+    # http_test()
+    time.sleep(500)
