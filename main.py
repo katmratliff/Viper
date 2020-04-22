@@ -11,9 +11,41 @@ from machine import UART
 import time
 from machine import I2C
 import usocket
+import network
+'''
+Commands we are going to send/receive to TEENSY
+
+SEND_____
+C1 (ask for Send voltage rail values to senderNum)
+C2 (ask for Sample, and start timer to send sample status back to user)
+C3 Turn ISCO on or off (not sure why we do this)
+C4 Changes the sample mode (auto/manual)
+C5 Change auto sample interval
+_________
+***
+***
+RECEIVE______
+Cx where x = value asked
+Cx where  x = string status
+Cx where x is status
+Cx where x is status
+Cx where x is status
+_____________
+
+Plan of attack for development!:::
+
+1. We set up a loop in the xbee that waits for a cell-phone text or message from teensy
+1a. Let's rely on XBEE timing over teensy clock (this has internet connection)
+2. If we receive a text message to the user we want to make sure we save that cell  # so we don't run
+into the issue of dealing with texts from multiple users.
+2a.  If we receive a text, lets put it into a buffer/variable array that expands or contracts based on how many text 
+messages there are.  Basically make it a Dictionary that starts off as empty (this may be hard without interrupts (im looking into this))
+3.
+'''
 
 # socket notes
 '''
+
 # Import the socket module.  
 # This allows the creation/use of socket objects.
  
@@ -54,6 +86,19 @@ socketObject.close()
 print("Socket closed.")
  
 
+'''
+
+
+'''
+THESE ARE THE PHONE NUMBER WE ACCEPT!
+char* hawesPhone = "+12524126262";  
+Numbers to accept SMS commands from: (from the old teensy code)
+char* annesPhone1 = "+19198860812";
+char* annesPhone2 = "+15179451531";
+char* katherinesPhone = "+16157148918";
+char* worthsPhone = "+19194233837";
+char* googlePhone = "+19192301472";
+char* garrettPhone = "+19196019412";
 '''
 # Set up HTTP COMMS with VIPER
 
@@ -102,15 +147,53 @@ This ^^ is all the body
 
 uart = UART(1, 115200)
 data = 0
+sms = 0
+ident = 0
+t = 0
+
+def create_time(array):
+    # (year, month, day, hour, second, day, yearday)
+    # 2011-08-19T15:31:08-04:00 is style we want to create
+    array = 0
 
 
 def read_serial():
-    host = "Placeholder"  # this will be the Viper URL
-    if uart.any() > 0:
-        post = uart.read(uart.any())
-        http_post(host, post)
-    time.sleep(5)
+    global data
+    global ident
+    global t
 
+    if uart.any() > 0:
+        serial = uart.read(uart.any())
+        types = check_serial_type(serial)
+        if types is 0:
+            return 0
+        elif types is 1: # post to viper
+            serial = serial[1:]
+            t = (time.localtime()) #(year, month, day, hour, second, day, yearday)
+            t = create_time(t)
+            ssend()
+
+        elif types is 2: # send to users
+            serial = serial[1:]
+            send_text(serial)
+    else:
+        return 0
+
+
+
+def send_serial(message):
+    uart.write(message)
+
+
+def check_serial_type(msg):
+    if msg:
+        first = msg[0:1]
+        first = first.lower()
+        switcher = {
+            "p": 1,
+            "c": 2
+        }
+        return switcher.get(first, 0)
 
 '''
 HTTP example
@@ -169,7 +252,7 @@ def http_post(host, body):
         s.close()
 
 
-def http_test():
+def http_test(post,date,ident):
     st = socket.socket()
     try:
         st.connect(("https://viper.response.epa.gov/CAP/post", 443))
@@ -180,12 +263,12 @@ def http_test():
                      '<alert xmlns: xsi = "http://www.w3.org/2001/XMLSchema-instance"'
                      'xmlns: xsd = "http://www.w3.org/2001/XMLSchema"'
                      'xmlns = "urn:oasis:names:tc:emergency:cap:1.1">'
-                     '<identifier> 281005951_634498074648864996 </identifier '
+                     '<identifier> '+ident+' </identifier '
                      '<sender> EPA_WET_BOARD </sender>'
-                     '<sent>2011-08-19T15:31:08-04:00</sent>>'
+                     '<sent>'+ date + '</sent>>'
                      '<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>'
                      '<info>'
-                     '<headline> ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>'
+                     '<headline> '+ post +'</headline>'
                      '<area>'
                      '<circle>38.904722, -77.016389 0</circle>'
                      '</area>'
@@ -196,18 +279,18 @@ def http_test():
         st.close()
 
 
-def ssend():
+def ssend(body,ident,time):
     print("\n Starting Response \n")
     post = bytes('<?xml version="1.0" encoding="utf-8"?>\n'
                  '<alert xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
                  'xmlns:xsd="http://www.w3.org/2001/XMLSchema"\n'
                  'xmlns="urn:oasis:names:tc:emergency:cap:1.1">\n'
-                 '<identifier>281005951_634498074648864996</identifier>\n'
+                 '<identifier>'+ident+'</identifier>\n'
                  '<sender>EPA_WET_BOARD</sender>\n'
-                 '<sent>2011-08-19T15:31:08-04:00</sent>\n'
+                 '<sent>'+time+'</sent>\n'
                  '<source>Acme Particulate Monitor,APM S/N 123456,0,0</source>\n'
                  '<info>\n'
-                 '<headline>ConcRT;0.001;mg/m3;Green;ConcHr;0;mg/m3;Green;</headline>\n'
+                 '<headline>'+body+'</headline>\n'
                  '<area>\n'
                  '<circle>38.904722, -77.016389 0</circle>\n'
                  '</area>\n'
@@ -228,6 +311,16 @@ def ssend():
     print("Socket closed.")
 
 i2c = I2C(1, freq=400000)  # I2c Module
+c = network.Cellular()
+def command_read(comm):
+    switcher = {
+        1: "C1",
+        2: "C2",
+        3: "C3",
+        4: "C4",
+        5: "C5"
+    }
+    return switcher.get(comm, "Invalid command")
 
 
 def i2c_read():
@@ -237,7 +330,34 @@ def i2c_read():
     return data_i2c
 
 
+def check_txt():
+    if c.isconnected():
+        sms = c.sms_receive()
+        if sms:
+            if command_read(sms['message']) is "Invalid command":
+                return 0
+            else:
+                return sms['message'],sms
+
+def create_msg(msg):
+    msg = "C" + msg
+    return msg
+
+
+def send_text(msg,sms):
+    c.sms_send(sms['sender'], msg)
+
+
 while True:
-    ssend()
-    # http_test()
-    time.sleep(500)
+    serial_type = 0
+    msg,sms = check_txt()  # check for text*
+    if msg is not 0:
+        msg = create_msg(msg)
+        send_serial(msg)  # if true: interface with Teensy and send Teensy C#
+
+    read_serial()
+
+    # if true: interface with Teensy and send Teensy C#
+    # check timer for VIPER POST
+
+    time.sleep(5)
