@@ -152,10 +152,16 @@ ident = 0
 t = 0
 
 def create_time(array):
-    # (year, month, day, hour, second, day, yearday)
+    # (year, month, day, hour, second, day of week , day of year)
     # 2011-08-19T15:31:08-04:00 is style we want to create
-    array = 0
-
+    year = array[0]
+    month = array[1]
+    day = array[2]
+    hour = array[3]
+    second = array[4]
+    yearday = array[6]
+    total_time = ""+year + "-" + month + "-" + day + "T" + hour
+    return total_time
 
 def read_serial():
     global data
@@ -169,9 +175,10 @@ def read_serial():
             return 0
         elif types is 1: # post to viper
             serial = serial[1:]
-            t = (time.localtime()) #(year, month, day, hour, second, day, yearday)
+            t = (time.localtime())  # (year, month, day, hour, second, day, yearday)
             t = create_time(t)
-            ssend()
+            ident = ident + 1
+            ssend(serial,ident,time)
 
         elif types is 2: # send to users
             serial = serial[1:]
